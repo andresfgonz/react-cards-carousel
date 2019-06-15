@@ -1,0 +1,175 @@
+$animationTime: 0.3s;
+
+
+@mixin cardStyle($name, $position: center) {
+  @if ($name == level-one) {
+    z-index: 3;
+    width: 700px;
+    height: 300px;
+    transform: translateX(0);
+  } @else if ($name == level-two) {
+    z-index: 2;
+    width: 560px;
+    height: 240px;
+    @if ($position == left) {
+      transform: translateX(-30%);
+    }
+    @if ($position == right) {
+      transform: translateX(30%);
+    }
+  } @else if ($name == level-three) {
+    z-index: 1;
+    width: 420px;
+    height: 180px;
+    @if ($position == left) {
+      transform: translateX(-70%);
+    }
+    @if ($position == right) {
+      transform: translateX(70%);
+    }
+  } @else if ($name == hidden) {
+    opacity: 0;
+    transform: translateX(0);
+    z-index: 0;
+  }
+}
+
+@mixin cardTransition($name, $cardLevel, $position: center) {
+  animation: #{$name} $animationTime ease-in-out;
+  animation-fill-mode: forwards;
+
+  @keyframes #{$name} {
+    to {
+      @include cardStyle($cardLevel, $position);
+    }
+  }
+}
+
+.carousel-container {
+  width: 100%;
+  height: 500px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 100px;
+  position: relative;
+
+
+  .slide-button {
+    background-color: #ffffff;
+    box-shadow: 0 0 15px #e4e4e4;
+    width: 60px;
+    height: 60px;
+    border-radius: 30px;
+    position: absolute;
+    font-size: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+
+    &.left {
+      left: 50px;
+    }
+
+    &.right {
+      right: 50px;
+    }
+  }
+
+  .card {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 17px 30px #00000045;
+    z-index: 1;
+    position: absolute;
+    display: flex;
+    padding: 5px;
+
+    &.hidden {
+      opacity: 0;
+      transform: translateX(0);
+    }
+
+    img {
+      width: 100%;
+      border-radius: 10px;
+    }
+
+    &.level-one {
+      @include cardStyle(level-one);
+
+      &.to-left-level-two {
+        @include cardTransition(toLeftLevelTwo, level-two, left);
+      }
+
+      &.to-right-level-two {
+        z-index: 3;
+        @include cardTransition(toRightLevelTwo, level-two, right);
+      }
+    }
+
+    &.left-level-two {
+      @include cardStyle(level-two, left);
+
+      &.to-level-three {
+        @include cardTransition(toLeftLevelThree, level-three, left);
+      }
+
+      &.to-level-one {
+        z-index: 4;
+        @include cardTransition(FromLeftLevel2toLevel1, level-one);
+      }
+    }
+
+    &.right-level-two {
+      @include cardStyle(level-two, right);
+
+      &.to-level-three {
+        @include cardTransition(toRightLevelThree, level-three, right);
+      }
+
+      &.to-level-one {
+        z-index: 3;
+        @include cardTransition(FromRightLevel2toLevel1, level-one);
+      }
+    }
+
+    &.left-level-three {
+      @include cardStyle(level-three, left);
+
+      &.to-level-two {
+        @include cardTransition(FromLeftLevel3ToLevel2, level-two, left);
+      }
+
+    }
+
+    &.right-level-three {
+      @include cardStyle(level-three, right);
+
+      &.to-level-two {
+        @include cardTransition(FromRightLevel3ToLevel2, level-two, right);
+      }
+    }
+
+    &.to-disappear {
+      @include cardTransition(toDisappear, hidden);
+    }
+
+    &.to-appear {
+      animation: toAppear $animationTime ease-out;
+
+      @keyframes toAppear {
+        from {
+          z-index: 0;
+          opacity: 0;
+          transform: translateX(0);
+        }
+      }
+    }
+
+    &.level-three {
+      @include cardStyle(hidden)
+    }
+  }
+}
